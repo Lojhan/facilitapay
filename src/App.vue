@@ -11,7 +11,7 @@
     </div>
 
     <div class="my-5">
-      <h1>{{ multiplier }}</h1>
+      <h1> {{selectedValue1.name}} => {{selectedValue2.name}} : {{ multiplier }}</h1>
       <h1>IOF (1,10%) = {{selectedValue1.name}} {{ IOF }}.00</h1>
       <h1>Taxa administrativa = {{selectedValue1.name}} {{ taxa }}.00</h1>
     </div>
@@ -44,6 +44,7 @@ export default {
     data() {
       
         return {
+            to: 0,
             value: 0,
             selectedValue1: {name: 'BRL'},
     
@@ -55,50 +56,45 @@ export default {
             ]
         }
     },
+    methods: {
+      BRLto() {
+        var val = 0
+        switch (this.selectedValue2.name){
+          case 'BRL': { this.to = 1; val = this.value; break }
+          case 'USD': { this.to = (1 / 5.2164); val = (this.value - this.IOF - this.taxa) / 5.2164; break }
+          case 'EUR': { this.to = (1 / 6.3970); val = (this.value - this.IOF - this.taxa) / 6.3970; break }
+        }
+        return val
+      },
+      USDto(){
+        var val = 0
+        switch (this.selectedValue2.name){
+          case 'BRL': { this.to = (1 * 5.2164); val = (this.value - this.IOF - this.taxa) * 5.2164; break }
+          case 'USD': { this.to = 1; val = this.value; break }
+          case 'EUR': { this.to = (1 / 1.2206); val = (this.value - this.IOF - this.taxa) / 1.2206; break}
+        }
+        return val
+      },
+      EURto(){
+        var val = 0
+        switch (this.selectedValue2.name){
+          case 'BRL': { this.to = (1 * 6.3970); val = (this.value - this.IOF - this.taxa) * 6.3970; break }
+          case 'USD': { this.to = (1 * 1.2206); val = (this.value - this.IOF - this.taxa) * 1.2206; break } 
+          case 'EUR': { this.to = 1; val = this.value; break }
+        }
+        return val
+      }
+    },
     computed: {
-    multiplier() { return this.value * 0.01 }, 
+    multiplier() { return this.to }, 
     newValue() { 
-      var value = 0
-
-      const BRLto = () => {
-        var brl = 0
-        switch (this.selectedValue2.name){
-          case 'BRL': brl = this.value; break
-          case 'USD': brl = (this.value - this.IOF - this.taxa) / 5.2164; break
-          case 'EUR': brl = (this.value - this.IOF - this.taxa) / 6.3970; break
-        }
-        return brl
-      }
-
-      const USDto = () => {
-        var usd = 0
-        switch (this.selectedValue2.name){
-          case 'BRL': usd = (this.value - this.IOF - this.taxa) * 5.2164; break
-          case 'USD': usd = this.value; break
-          case 'EUR': usd = (this.value - this.IOF - this.taxa) / 1.2206; break
-        }
-        return usd
-      }
-
-      const EURto = () => {
-        var eur = 0
-        switch (this.selectedValue2.name){
-          case 'BRL': eur = (this.value - this.IOF - this.taxa) * 6.3970; break 
-          case 'USD': eur = (this.value - this.IOF - this.taxa) * 1.2206; break 
-          case 'EUR': eur = this.value; break
-        }
-        return eur
-      }
-
-
+      var val = 0
       switch (this.selectedValue1.name){
-        case 'BRL': value = BRLto(); break
-        case 'USD': value = USDto(); break
-        case 'EUR': value = EURto(); break
+        case 'BRL': val = this.BRLto(); break
+        case 'USD': val = this.USDto(); break
+        case 'EUR': val = this.EURto(); break
       }
-
-
-      return value
+      return val
       }, 
     IOF() { return this.value * 0.011 }, 
     taxa() { return this.value * 0.01 }
